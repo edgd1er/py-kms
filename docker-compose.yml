@@ -1,0 +1,27 @@
+version: '3'
+services:
+  py-kms:
+    image: py-kms
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "1686:1688"
+      - "1687:8080"
+    labels:
+      com.centurylinklabs.watchtower.enable: "false"
+    environment:
+      - IP=0.0.0.0
+      - PORT=1688
+      - SQLITE=true
+      - PYKMS_DB=/db/pykms_database.db
+      - HWID=RANDOM
+      - LOGLEVEL=DEBUG
+      #- LOGFILE=/var/log/pykms_logserver.log
+      - LOGFILE=STDOUT
+      - LOGSIZE=
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./:/db/
+      - ./log/:/var/log:rw
