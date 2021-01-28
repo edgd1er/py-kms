@@ -1,7 +1,7 @@
 # Readme
-![repo-size](https://img.shields.io/github/repo-size/SystemRage/py-kms)
-![open-issues](https://img.shields.io/github/issues/SystemRage/py-kms)
-![last-commit](https://img.shields.io/github/last-commit/SystemRage/py-kms/master)
+![repo-size](https://img.shields.io/github/repo-size/edgd1er/py-kms)
+![open-issues](https://img.shields.io/github/issues/edgd1er/py-kms)
+![last-commit](https://img.shields.io/github/last-commit/edgd1er/py-kms/master)
 ![docker-status](https://img.shields.io/docker/cloud/build/pykmsorg/py-kms)
 ![docker-pulls](https://img.shields.io/docker/pulls/pykmsorg/py-kms)
 ![read-the-docs](https://img.shields.io/readthedocs/py-kms)
@@ -42,6 +42,14 @@ The wiki has been completly reworked and is now available on [readthedocs.com](h
 - To start the server automatically using Docker, execute `docker run -d --name py-kms --restart always -p 1688:1688 pykmsorg/py-kms`.
 - To show the help pages type: `python3 pykms_Server.py -h` and `python3 pykms_Client.py -h`.
 - For launching _py-kms_ GUI make the file `pykms_Server.py` executable with `chmod +x /path/to/folder/py-kms/pykms_Server.py`, then simply run `pykms_Server.py` by double-clicking.
+
+## Docker changes:
+
+- database is moved to /db/, change path/name is possible, but change volume accordingly.
+- logs are stdout to fix fix containter size.
+- start.sh is simplified
+- user py-kms can have its uid and gid set to ease rights managements 
+- added multi arch build through
 
 ## License
    - _py-kms_ is [![Unlicense](https://img.shields.io/badge/license-unlicense-lightgray.svg)](https://github.com/SystemRage/py-kms/blob/master/LICENSE)
