@@ -1,5 +1,5 @@
 # Switch to the target image
-FROM alpine:3.12
+FROM alpine:3.12.7
 
 ENV IP		    0.0.0.0
 ENV PORT		  1688
@@ -20,20 +20,21 @@ ENV GID       ""
 COPY docker/docker-py3-kms/start.sh /usr/bin/start.sh
 COPY py-kms /home/py-kms
 
+#hadolint ignore=DL3013,DL3018
 RUN apk add --no-cache --update \
-	bash \
-	git \
-	py3-argparse \
-	py3-flask \
-	py3-pygments \
-	python3-tkinter \
-	sqlite-libs \
-	py3-pip \
-	shadow && \
+    bash \
+    git \
+    py3-argparse \
+    py3-flask \
+    py3-pygments \
+    python3-tkinter \
+    sqlite-libs \
+    py3-pip \
+    shadow && \
     git clone https://github.com/coleifer/sqlite-web.git /tmp/sqlite_web && \
     mv /tmp/sqlite_web/sqlite_web /home/ && \
     rm -rf /tmp/sqlite_web && \
-    pip3 install peewee tzlocal pysqlite3 && \
+    pip3 install --no-cache-dir peewee tzlocal pysqlite3 && \
     mkdir /db/ && \
     chmod a+x /usr/bin/start.sh && \
     apk del git && \
