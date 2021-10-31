@@ -1,0 +1,24 @@
+name: lint nordvpn proxy dockerfile
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    paths-ignore:
+      - '.github/**'
+
+jobs:
+  lint:
+    strategy:
+      matrix:
+        dfiles: [ ./docker/docker-py3-kms/Dockerfile, ./docker/docker-py3-kms-minimal/Dockerfile ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      - name: hadolint full
+        uses: hadolint/hadolint-action@v1.6.0
+        with:
+          dockerfile: ${{ matrix.dfiles }}
