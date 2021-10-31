@@ -1,13 +1,9 @@
-name: lint nordvpn proxy dockerfile
+name: lint Dockerfiles
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
-      - master
-    paths-ignore:
-      - '.github/**'
+  pull_request:
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -18,7 +14,14 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v2
-      - name: hadolint full
+      - name: hadolint
+        continue-on-error : true
         uses: hadolint/hadolint-action@v1.6.0
         with:
+          dockerfile: Dockerfile
+          recursive: true
+      - name : hadolint
+        continue-on-error : true
+        uses : hadolint/hadolint-action@v1.6.0
+        with :
           dockerfile: ${{ matrix.dfiles }}

@@ -1,17 +1,23 @@
-name: Build Image On Release
+name: Build Image
 
 on:
   workflow_dispatch:
   push:
     branches:
+      - main
       - master
+    paths-ignore :
+      - '.github/**'
   pull_request:
     branches:
       - master
+    paths-ignore:
+      - '.github/**'
 
 jobs:
   bake:
     strategy :
+      fail-fast: false
       matrix :
         dfiles : [ ./docker/docker-py3-kms/Dockerfile, ./docker/docker-py3-kms-minimal/Dockerfile ]
     runs-on: ubuntu-latest
@@ -20,10 +26,10 @@ jobs:
       contents: read
     steps:
       - name: set publish to true
-        echo "PUBLISH=false" >> $GITHUB_ENV
-      - name : set publish to false is from pull request
-        if: github_event_name == "pull_request"
-        echo "PUBLISH=false" >> $GITHUB_ENV
+        run:  echo "PUBLISH=false" >> $GITHUB_ENV
+      - name: set publish to false is from pull request
+        if: github.event_name == 'pull_request'
+        run: echo "PUBLISH=false" >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v2
       - name: Set up QEMU
