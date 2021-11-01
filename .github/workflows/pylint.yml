@@ -6,22 +6,29 @@ jobs:
   pylint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Set up Python 3.
+      - name: checkout project
+        uses: actions/checkout@v2
+      - name: Set up Python environment
         uses: actions/setup-python@v1
         with:
-          python-version: 3
-      - uses: actions/checkout@v2
+          python-version: "3.8"
+      - name: Python Pylin GitHub Action
+        uses: fylein/python-pylint-github-action@v1
+        with:
+          args: pylint py-kms
+  flake8:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout project
+        uses: actions/checkout@v2
+      - name: Set up Python environment
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.8"
       - name: flake8 Lint
-        continue-on-error: true
         uses: py-actions/flake8@v1
         with:
+          update-pip: true
+          max-line-length: "100"
           path: "py-kms"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pylint
-      - name: Analysing the code with pylint
-        continue-on-error: true
-        run: |
-          pylint `ls -R|grep .py$|xargs`
+          args: "--count --show-source --statistics"

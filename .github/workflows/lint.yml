@@ -15,14 +15,7 @@ jobs:
     steps:
       - name: checkout code
         uses: actions/checkout@v2
-      - name: hadolint
-        continue-on-error : true
-        uses: hadolint/hadolint-action@v1.6.0
-        with:
-          dockerfile: ./docker/docker-py3-kms/Dockerfile
-          recursive: true
       - name : hadolint
-        continue-on-error : true
         uses : hadolint/hadolint-action@v1.6.0
         with :
           dockerfile: ${{ matrix.dfiles }}
