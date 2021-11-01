@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: "3.8"
       - name: Python Pylin GitHub Action
-        uses: fylein/python-pylint-github-action@v1
+        uses: fylein/python-pylint-github-action@v4
         with:
           args: pylint py-kms
   flake8:
