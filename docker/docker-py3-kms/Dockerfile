@@ -53,7 +53,7 @@ COPY docker/start.py /usr/bin/start.py
 RUN chmod 755 /usr/bin/entrypoint.py
 
 WORKDIR /home/py-kms
-#USER py-kms
+
 EXPOSE ${PORT}/tcp
 EXPOSE 8080
 
