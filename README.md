@@ -14,10 +14,12 @@ This version of _py-kms_ is for itself a fork of the original implementation by 
 
 Very few changes from [upstream repository](https://github.com/SystemRage/py-kms):
 - added sample docker-compose.yml
-- start as py-kms user
+- start.sh is simplified, starts as py-kms user
 - define userId/groupid if needed for mounted volumes with acl or strict rights management (UID, GID)
 - simplified start.sh, sqlite database is a parameter (SQLITE=true/false) 
-- unique Dockerfile: multi arch build through buildx
+- unique Dockerfile per arch: multi arch build through buildx
+- logs are redirected to stdout to fix containter size.
+- database is moved to /db/, change path/name is possible, but change volume accordingly.
 
 ## Features
 - Responds to `v4`, `v5`, and `v6` KMS requests.
@@ -55,13 +57,6 @@ Very few changes from [upstream repository](https://github.com/SystemRage/py-kms
 - To show the help pages type: `python3 pykms_Server.py -h` and `python3 pykms_Client.py -h`.
 - For launching _py-kms_ GUI make the file `pykms_Server.py` executable with `chmod +x /path/to/folder/py-kms/pykms_Server.py`, then simply run `pykms_Server.py` by double-clicking.
 
-## Docker changes:
-
-- database is moved to /db/, change path/name is possible, but change volume accordingly.
-- logs are stdout to fix fix containter size.
-- start.sh is simplified
-- user py-kms can have its uid and gid set to ease rights managements 
-- added multi arch build through
 
 ## License
    - _py-kms_ is [![Unlicense](https://img.shields.io/badge/license-unlicense-lightgray.svg)](https://github.com/SystemRage/py-kms/blob/master/LICENSE)
