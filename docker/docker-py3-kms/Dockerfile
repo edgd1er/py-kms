@@ -1,5 +1,5 @@
 # Switch to the target image
-FROM alpine:3.15
+FROM alpine:3.18
 
 ARG BUILD_COMMIT=unknown
 ARG BUILD_BRANCH=unknown
@@ -18,7 +18,13 @@ ENV LOGSIZE ""
 ENV TZ America/Chicago
 ENV WEBUI 1
 
-COPY docker/docker-py3-kms/requirements.txt /home/py-kms/
+COPY py-kms /home/py-kms/
+COPY docker/start.py /usr/bin/start.py
+COPY docker/entrypoint.py /usr/bin/entrypoint.py
+COPY docker/healthcheck.py /usr/bin/healthcheck.py
+COPY docker/docker-py3-kms/requirements.txt /home/py-kms/requirements.txt
+COPY LICENSE /LICENSE
+#hadolint ignore=DL3013,DL3018
 RUN apk add --no-cache --update \
   bash \
   python3 \
@@ -32,17 +38,11 @@ RUN apk add --no-cache --update \
   && adduser -S py-kms -G users -s /bin/bash \
   && chown py-kms:users /home/py-kms \
   # Fix undefined timezone, in case the user did not mount the /etc/localtime
-  && ln -sf /usr/share/zoneinfo/UTC /etc/localtime
-
-COPY py-kms /home/py-kms/
-COPY docker/entrypoint.py /usr/bin/entrypoint.py
-COPY docker/healthcheck.py /usr/bin/healthcheck.py
-COPY docker/start.py /usr/bin/start.py
-RUN chmod 555 /usr/bin/entrypoint.py /usr/bin/healthcheck.py /usr/bin/start.py
-
-# Web-interface specifics
-COPY LICENSE /LICENSE
-RUN echo "$BUILD_COMMIT" > /VERSION && echo "$BUILD_BRANCH" >> /VERSION
+  && ln -sf /usr/share/zoneinfo/UTC /etc/localtime \
+  # Web-interface specifics
+  && echo "$BUILD_COMMIT" > /VERSION \
+  && echo "$BUILD_BRANCH" >> /VERSION \
+  && chmod 755 /usr/bin/entrypoint.py
 
 WORKDIR /home/py-kms
 
