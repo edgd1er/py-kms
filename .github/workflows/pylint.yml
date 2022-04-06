@@ -1,0 +1,34 @@
+name: linting python
+
+on: [ push, pull_request ]
+
+jobs:
+  pylint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout project
+        uses: actions/checkout@v3
+      - name: Set up Python environment
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: "3.8"
+      - name: Python Pylin GitHub Action
+        uses: fylein/python-pylint-github-action@v4
+        with:
+          args: pylint py-kms
+  flake8:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout project
+        uses: actions/checkout@v3
+      - name: Set up Python environment
+        uses: actions/setup-python@v4.5.0
+        with:
+          python-version: "3.8"
+      - name: flake8 Lint
+        uses: py-actions/flake8@v2
+        with:
+          update-pip: true
+          max-line-length: "100"
+          path: "py-kms"
+          args: "--count --show-source --statistics"
