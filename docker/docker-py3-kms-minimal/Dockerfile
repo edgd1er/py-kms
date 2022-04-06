@@ -16,6 +16,7 @@ ENV TYPE MINIMAL
 
 COPY ./py-kms /home/py-kms
 COPY docker/requirements_minimal.txt /home/py-kms/requirements.txt
+#hadolint ignore=DL3013,DL3018
 RUN apk add --no-cache --update \
 bash \
   python3 \

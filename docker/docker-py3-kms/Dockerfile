@@ -18,6 +18,7 @@ ENV TZ America/Chicago
 
 COPY py-kms /home/py-kms/
 COPY docker/requirements.txt /home/py-kms/
+#hadolint ignore=DL3013,DL3018
 RUN apk add --no-cache --update \
   bash \
   python3 \
