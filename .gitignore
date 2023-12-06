@@ -132,3 +132,6 @@ charts/*/*.tgz
 /.idea/
 docker-compose-*.yml
 *.sh
+
+docker-compose.yml
+docker-compose.yml.*

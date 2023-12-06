@@ -1,5 +1,5 @@
 # This is a minimized version from docker/docker-py3-kms/Dockerfile without SQLite support to further reduce image size
-FROM alpine:3.15
+FROM alpine:3.19
 
 ENV IP ::
 ENV PORT 1688
@@ -14,7 +14,12 @@ ENV LOGFILE STDOUT
 ENV LOGSIZE ""
 ENV WEBUI 0
 
+COPY py-kms /home/py-kms/
+COPY docker/start.py /usr/bin/start.py
+COPY docker/entrypoint.py /usr/bin/entrypoint.py
+COPY docker/healthcheck.py /usr/bin/healthcheck.py
 COPY docker/docker-py3-kms-minimal/requirements.txt /home/py-kms/requirements.txt
+#hadolint ignore=DL3013,DL3018
 RUN apk add --no-cache --update \
 bash \
   python3 \
@@ -22,17 +27,15 @@ bash \
   ca-certificates \
   shadow \
   tzdata \
-  && pip3 install --no-cache-dir -r /home/py-kms/requirements.txt \
+  py3-dnspython>=2.2.1 py3-tzlocal>=4.2 \
+  #&& pip3 install --no-cache-dir -r /home/py-kms/requirements.txt \
   && adduser -S py-kms -G users -s /bin/bash \
   && chown py-kms:users /home/py-kms \
   # Fix undefined timezone, in case the user did not mount the /etc/localtime
-  && ln -sf /usr/share/zoneinfo/UTC /etc/localtime
-
-COPY ./py-kms /home/py-kms
-COPY docker/entrypoint.py /usr/bin/entrypoint.py
-COPY docker/healthcheck.py /usr/bin/healthcheck.py
-COPY docker/start.py /usr/bin/start.py
-RUN chmod 555 /usr/bin/entrypoint.py /usr/bin/healthcheck.py /usr/bin/start.py
+  && ln -sf /usr/share/zoneinfo/UTC /etc/localtime \
+  && chmod 755 /usr/bin/entrypoint.py \
+  && echo "$BUILD_COMMIT" > /VERSION \
+  && echo "$BUILD_BRANCH" > /VERSION
 
 WORKDIR /home/py-kms
 
