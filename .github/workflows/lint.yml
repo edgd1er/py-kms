@@ -1,0 +1,22 @@
+name: lint Dockerfiles
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    strategy:
+      fail-fast: false
+      matrix:
+        dfiles: [ ./docker/docker-py3-kms/Dockerfile, ./docker/docker-py3-kms-minimal/Dockerfile ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name : hadolint
+        uses : hadolint/hadolint-action@v3
+        with :
+          dockerfile: ${{ matrix.dfiles }}
+          recursive: true

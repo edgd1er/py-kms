@@ -78,7 +78,7 @@ th {
             <td>{{ client.licenseStatus }}</td>
             <td class="convert_timestamp">{{ client.lastRequestTime }}</td>
             <td>
-                {% if client.kmsEpid | length > 16 %}
+                {% if client.kmsEpid | default("", True ) | length > 16 %}
                 <abbr title="{{ client.kmsEpid }}">{{ client.kmsEpid | truncate(16, True, '...') }}</abbr>
                 {% else %}
                 {{ client.kmsEpid }}
