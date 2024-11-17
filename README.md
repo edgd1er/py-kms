@@ -1,8 +1,8 @@
-# py-kms
-
-![repo-size](https://img.shields.io/github/repo-size/Py-KMS-Organization/py-kms)
-![open-issues](https://img.shields.io/github/issues/Py-KMS-Organization/py-kms)
-![last-commit](https://img.shields.io/github/last-commit/Py-KMS-Organization/py-kms/main)
+# Readme
+![repo-size](https://img.shields.io/github/repo-size/edgd1er/py-kms)
+![open-issues](https://img.shields.io/github/issues/edgd1er/py-kms)
+![last-commit](https://img.shields.io/github/last-commit/edgd1er/py-kms/main)
+![docker-status](https://img.shields.io/docker/cloud/build/pykmsorg/py-kms)
 ![docker-pulls](https://img.shields.io/docker/pulls/pykmsorg/py-kms)
 ![read-the-docs](https://img.shields.io/readthedocs/py-kms)
 
@@ -14,6 +14,16 @@ This version of _py-kms_ is for itself a fork of the original implementation by 
 
 ### What is with version `1.0.0`?
 Semantic versioning is now being used in this project, so checkout the [GitHub Releases](https://github.com/Py-KMS-Organization/py-kms/releases). Before, a `CHANGELOG.md` file was used to track changes, but got abandoned over time. Its content got moved into the [Historic Releases](docs/Historic%20Releases.md) document for reference. 
+
+
+Very few changes from [upstream repository](https://github.com/SystemRage/py-kms):
+- added sample compose.yml
+- start.sh is simplified, starts as py-kms user
+- define userId/groupid if needed for mounted volumes with acl or strict rights management (UID, GID)
+- simplified start.sh, sqlite database is a parameter (SQLITE=true/false) 
+- unique Dockerfile per arch: multi arch build through buildx
+- logs are redirected to stdout to fix containter size.
+- database is moved to /home/py-kms/db/, mounted volume is advised.
 
 ## Features
 - Responds to `v4`, `v5`, and `v6` KMS requests.
@@ -33,6 +43,7 @@ The wiki has been completely reworked and is now available on [readthedocs.io](h
   - **[In case your OS does not support IPv6](https://github.com/Py-KMS-Organization/py-kms/issues/108), make sure to explicitly specify the legacy IPv4 of `0.0.0.0`!**
 - To start the server automatically using Docker, execute `docker run -d --name py-kms --restart always -p 1688:1688 ghcr.io/py-kms-organization/py-kms`.
 - To show the help pages type: `python3 pykms_Server.py -h` and `python3 pykms_Client.py -h`.
+
 
 ## License
    - _py-kms_ is [![Unlicense](https://img.shields.io/badge/license-unlicense-lightgray.svg)](./LICENSE)
