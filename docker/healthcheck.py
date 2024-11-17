@@ -16,9 +16,10 @@ def do_check(logger):
       logger.debug(f"Trying to connect to {address}...")
       s.connect(address)
       s.close()
+      logger.debug(f"Closing connection to {address}...")
       return True
-    except:
-      pass
+    except Exception as e:
+      logger.error(f'Exception: {e}')
   return False # no connection could be established
 
 
