@@ -12,6 +12,7 @@ import threading
 import socketserver
 import queue as Queue
 import selectors
+import traceback
 from time import monotonic as time
 
 import pykms_RpcBind, pykms_RpcRequest
@@ -124,7 +125,8 @@ class KeyServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
                                put_text = "{reverse}{red}{bold}Server connection timed out. Exiting...{end}")
 
         def handle_error(self, request, client_address):
-                pass
+                pretty_printer(log_obj = loggersrv.error,
+                                   put_text = "{reverse}{red}{bold}Exception happened during processing of request from %s:\n%s{end}" % (str(client_address), traceback.format_exc()))
 
 
 class server_thread(threading.Thread):
