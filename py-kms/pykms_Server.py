@@ -384,7 +384,7 @@ def server_check():
                         pykms_Sql.sql_initialize(srv_config['sqlite'])
                 else:
                         srv_config['sqlite'] = False
-                
+
         # Check other specific server options.
         opts = [('clientcount', '-c/--client-count'),
                 ('timeoutidle', '-t0/--timeout-idle'),
