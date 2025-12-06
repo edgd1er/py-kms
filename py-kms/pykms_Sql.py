@@ -109,8 +109,9 @@ def sql_update(dbName, infoDict):
                         # Update only changed columns
                         common_postfix = "WHERE clientMachineId=:clientMachineId AND applicationId=:applicationId"
                         def update_column_if_changed(column_name, new_value):
-                                assert column_name in _column_name_to_index, f"Unknown column name: {column_name}"
                                 assert "clientMachineId" in infoDict and "applicationId" in infoDict, "infoDict must contain 'clientMachineId' and 'applicationId'"
+                                if column_name not in _column_name_to_index:
+                                        raise ValueError(f"Unknown column name: {column_name}")
                                 if data[_column_name_to_index[column_name]] != new_value:
                                         query = f"UPDATE clients SET {column_name}=:value {common_postfix}"
                                         cur.execute(query, {"value": new_value, "clientMachineId": infoDict['clientMachineId'], "applicationId": infoDict['applicationId']})
