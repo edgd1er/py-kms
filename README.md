@@ -23,7 +23,7 @@ Semantic versioning is now being used in this project, so checkout the [GitHub R
   - Uses `sqlite` for persistent data storage (with a simple web-based explorer).
 
 ## Documentation
-The wiki has been completly reworked and is now available on [readthedocs.io](https://py-kms.readthedocs.io/en/latest/). It should provide you all the necessary information about how to setup and to use _py-kms_, all without clumping this readme. The documentation also houses more details about the activation procedure with _py-kms_ and how to get GVLK keys.
+The wiki has been completely reworked and is now available on [readthedocs.io](https://py-kms.readthedocs.io/en/latest/). It should provide you all the necessary information about how to setup and to use _py-kms_, all without clumping this readme. The documentation also houses more details about the activation procedure with _py-kms_ and how to get GVLK keys.
        
 ## Quick start
 - To start the server, execute `python3 pykms_Server.py [IPADDRESS] [PORT]`, the default _IPADDRESS_ is `::` ( all interfaces ) and the default _PORT_ is `1688`.
