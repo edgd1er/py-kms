@@ -118,8 +118,8 @@ def sql_update(dbName, infoDict):
                                         assert column_name in _column_name_to_index, f"Unknown column name: {column_name}"
                                         assert "clientMachineId" in infoDict and "applicationId" in infoDict, "infoDict must contain 'clientMachineId' and 'applicationId'"
                                         if data[_column_name_to_index[column_name]] != new_value:
-                                                query = f"UPDATE clients SET {column_name}=? {common_postfix}"
-                                                cur.execute(query, (new_value, infoDict['clientMachineId'], infoDict['applicationId']))
+                                                query = f"UPDATE clients SET {column_name}=:value {common_postfix}"
+                                                cur.execute(query, {"value": new_value, "clientMachineId": infoDict['clientMachineId'], "applicationId": infoDict['applicationId']})
 
                                 # Dynamically check and maybe update all columns
                                 for column_name in _column_name_to_index.keys():
