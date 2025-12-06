@@ -75,7 +75,7 @@ def sql_get_all(dbName):
                 return None
         with sqlite3.connect(dbName) as con:
                 cur = con.cursor()
-                cur.execute("SELECT * FROM clients")
+                cur.execute(f"SELECT {', '.join(_column_name_to_index.keys())} FROM clients")
                 clients = []
                 for row in cur.fetchall():
                         loggersrv.debug(f"Row: {row}")
@@ -113,7 +113,7 @@ def sql_update(dbName, infoDict):
 
                         else:
                                 # Update only changed columns
-                                common_postfix = "WHERE clientMachineId=:clientMachineId AND applicationId=:applicationId;"
+                                common_postfix = "WHERE clientMachineId=:clientMachineId AND applicationId=:applicationId"
                                 def update_column_if_changed(column_name, new_value):
                                         assert column_name in _column_name_to_index, f"Unknown column name: {column_name}"
                                         assert "clientMachineId" in infoDict and "applicationId" in infoDict, "infoDict must contain 'clientMachineId' and 'applicationId'"
