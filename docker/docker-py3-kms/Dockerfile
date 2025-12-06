@@ -2,7 +2,7 @@
 FROM alpine:3.22
 
 ARG BUILD_COMMIT=unknown
-ARG BUILD_BRANCH=unknown
+ARG BUILD_REFERENCE=unknown
 
 ENV IP=::
 ENV DUALSTACK=1
@@ -50,7 +50,7 @@ RUN chown root: -R /home/py-kms && \
 
 # Web-interface specifics
 COPY LICENSE /LICENSE
-RUN echo "$BUILD_COMMIT" > /VERSION && echo "$BUILD_BRANCH" >> /VERSION
+RUN echo "$BUILD_COMMIT" > /VERSION && echo "$BUILD_REFERENCE" >> /VERSION
 
 WORKDIR /home/py-kms
 
