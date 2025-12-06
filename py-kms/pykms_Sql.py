@@ -107,6 +107,7 @@ def sql_update(dbName, infoDict):
                         data = cur.fetchone()
                         if not data:
                                 # Insert new row with all given info
+                                infoDict["kmsEpid"] = ""  # Default empty value
                                 infoDict["requestCount"] = 1
                                 cur.execute(f"""INSERT INTO clients ({', '.join(_column_name_to_index.keys())})
                                         VALUES ({', '.join(':' + col for col in _column_name_to_index.keys())});""", infoDict)
