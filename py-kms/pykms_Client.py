@@ -170,7 +170,7 @@ def client_update():
         for appitem in appitems:
                 kmsitems = appitem['KmsItems']
                 for kmsitem in kmsitems:                                
-                        name = re.sub(r'\(.*\)', '', kmsitem['DisplayName']) # Remove bracets
+                        name = re.sub(r'\(.*\)', '', kmsitem['DisplayName']) # Remove brackets
                         name = name.replace('2015', '') # Remove specific years
                         name = name.replace(' ', '') # Ignore whitespaces
                         name = name.replace('/11', '', 1) # Cut out Windows 11, as it is basically Windows 10

@@ -385,7 +385,6 @@ def server_check():
                 else:
                         srv_config['sqlite'] = False
                 
-
         # Check other specific server options.
         opts = [('clientcount', '-c/--client-count'),
                 ('timeoutidle', '-t0/--timeout-idle'),

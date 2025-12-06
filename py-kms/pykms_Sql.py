@@ -121,7 +121,7 @@ def sql_update(dbName, infoDict):
                                                 query = f"UPDATE clients SET {column_name}=? {common_postfix}"
                                                 cur.execute(query, (new_value, infoDict['clientMachineId'], infoDict['applicationId']))
 
-                                # Dynamically check and maybe up date all columns
+                                # Dynamically check and maybe update all columns
                                 for column_name in _column_name_to_index.keys():
                                         if column_name in ["clientMachineId", "applicationId", "requestCount"]:
                                                 continue  # Skip these columns
