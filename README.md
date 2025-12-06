@@ -2,7 +2,7 @@
 
 ![repo-size](https://img.shields.io/github/repo-size/Py-KMS-Organization/py-kms)
 ![open-issues](https://img.shields.io/github/issues/Py-KMS-Organization/py-kms)
-![last-commit](https://img.shields.io/github/last-commit/Py-KMS-Organization/py-kms/master)
+![last-commit](https://img.shields.io/github/last-commit/Py-KMS-Organization/py-kms/main)
 ![docker-pulls](https://img.shields.io/docker/pulls/pykmsorg/py-kms)
 ![read-the-docs](https://img.shields.io/readthedocs/py-kms)
 
