@@ -20,18 +20,12 @@ def sql_initialize(dbName):
         if not os.path.isfile(dbName):
                 # Initialize the database.
                 loggersrv.debug(f'Initializing database file "{dbName}"...')
-                con = None
                 try:
-                        con = sqlite3.connect(dbName)
-                        cur = con.cursor()
-                        cur.execute("CREATE TABLE clients(clientMachineId TEXT , machineName TEXT, applicationId TEXT, skuId TEXT, licenseStatus TEXT, lastRequestTime INTEGER, kmsEpid TEXT, requestCount INTEGER, PRIMARY KEY(clientMachineId, applicationId))")
-
+                        with sqlite3.connect(dbName) as con:
+                                cur = con.cursor()
+                                cur.execute("CREATE TABLE clients(clientMachineId TEXT, machineName TEXT, applicationId TEXT, skuId TEXT, licenseStatus TEXT, lastRequestTime INTEGER, kmsEpid TEXT, requestCount INTEGER, PRIMARY KEY(clientMachineId, applicationId))")
                 except sqlite3.Error as e:
                         pretty_printer(log_obj = loggersrv.error, to_exit = True, put_text = "{reverse}{red}{bold}Sqlite Error: %s. Exiting...{end}" %str(e))
-                finally:
-                        if con:
-                                con.commit()
-                                con.close()
 
 def sql_get_all(dbName):
         if not os.path.isfile(dbName):
