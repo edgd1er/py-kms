@@ -15,7 +15,7 @@ import selectors
 import traceback
 from time import monotonic as time
 
-import pykms_RpcBind, pykms_RpcRequest
+import pykms_RpcBind, pykms_RpcRequest, pykms_Sql
 from pykms_RpcBase import rpcBase
 from pykms_Dcerpc import MSRPCHeader
 from pykms_Misc import check_setup, check_lcid, check_other
@@ -23,7 +23,6 @@ from pykms_Misc import KmsParser, KmsParserException, KmsParserHelp
 from pykms_Misc import kms_parser_get, kms_parser_check_optionals, kms_parser_check_positionals, kms_parser_check_connect
 from pykms_Format import enco, deco, pretty_printer, justify
 from pykms_Connect import MultipleListener
-from pykms_Sql import sql_initialize
 
 srv_version             = "py-kms_2020-10-01"
 __license__             = "The Unlicense"
@@ -381,13 +380,11 @@ def server_check():
                                 put_text = "{reverse}{yellow}{bold}You specified a folder instead of a database file! This behavior is not officially supported anymore, please change your start parameters soon.{end}")
                         srv_config['sqlite'] = os.path.join(srv_config['sqlite'], 'pykms_database.db')
 
-                try:
-                        import sqlite3
-                        sql_initialize(srv_config['sqlite'])
-                except ImportError:
-                        pretty_printer(log_obj = loggersrv.warning,
-                                put_text = "{reverse}{yellow}{bold}Module 'sqlite3' not installed, database support disabled.{end}")
+                if pykms_Sql.available:
+                        pykms_Sql.sql_initialize(srv_config['sqlite'])
+                else:
                         srv_config['sqlite'] = False
+                
 
         # Check other specific server options.
         opts = [('clientcount', '-c/--client-count'),
