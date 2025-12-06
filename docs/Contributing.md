@@ -20,5 +20,7 @@ python3 pykms_Server.py -F STDOUT -s ./pykms_database.db
 ```
 Then trigger (multiple) client requests and check the output for errors via:
 ```bash
-python3 pykms_Client.py -F STDOUT -c 174f5409-0624-4ce3-b209-adde1091956b
+python3 pykms_Client.py -F STDOUT # fresh client
+python3 pykms_Client.py -F STDOUT -c 174f5409-0624-4ce3-b209-adde1091956b # (maybe) existing client
+python3 pykms_Client.py -F STDOUT -c 174f5409-0624-4ce3-b209-adde1091956b # now-for-sure existing client
 ```
