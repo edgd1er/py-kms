@@ -3,7 +3,7 @@
 You want to improve this project? 
 Awesome! But before you write or modify the existing source code, please note the following guideline:
 
-- Always make sure to add your changes to the wiki.
+- Always base your branch on the latest `next` branch to avoid merge conflicts.
 - 8-space indentation without tabs.
 - Docstrings as this:
 ```python
