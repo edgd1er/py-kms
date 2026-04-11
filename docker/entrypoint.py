@@ -15,15 +15,20 @@ PYTHON3 = '/usr/bin/python3'
 dbPath = os.path.join(os.sep, 'home', 'py-kms', 'db') # Do not include the database file name, as we must correct the folder permissions (the db file is recursively reachable)
 
 def change_uid_grp(logger):
-  if os.geteuid() != 0:
-    logger.info(f'not root user, cannot change uid/gid.')
-    return None
   user_db_entries = pwd.getpwnam("py-kms")
   user_grp_db_entries = grp.getgrnam("users")
-  uid = int(user_db_entries.pw_uid)
-  gid = int(user_grp_db_entries.gr_gid)
-  new_gid = int(os.getenv('GID', str(gid)))
-  new_uid = int(os.getenv('UID', str(uid)))
+  now_uid = os.geteuid() # as what are we running effectively right now?
+  now_gid = os.getegid()
+  ebd_uid = int(user_db_entries.pw_uid) # what was compiled (embedded) into the image?
+  ebd_gid = int(user_grp_db_entries.gr_gid)
+  new_gid = int(os.getenv('GID', str(ebd_gid))) # what is desired by the user at runtime?
+  new_uid = int(os.getenv('UID', str(ebd_uid)))
+  if now_uid == new_uid and now_gid == new_gid:
+    logger.info(f'UID/GID already set to {new_uid}:{new_gid}')
+    return None
+  if now_uid != 0:
+    logger.warning(f'Not root user (UID is {now_uid}), cannot change UID/GID to {new_uid}:{new_gid}!')
+    return None
   os.chown("/home/py-kms", new_uid, new_gid)
   os.chmod("/home/py-kms", 0o700)
   if os.path.isdir(dbPath):
@@ -50,9 +55,8 @@ def change_uid_grp(logger):
     os.chmod(os.environ['LOGFILE'], 0o777)
     logger.error(str(subprocess.check_output(['ls', '-la', os.environ['LOGFILE']])))
   # Drop actual permissions
-  logger.info(f"Setting gid to {new_gid}")
+  logger.info(f"Setting UID/GID to {new_uid}:{new_gid}")
   os.setgid(new_gid)
-  logger.info(f"Setting uid to {new_uid}")
   os.setuid(new_uid)
 
 def change_tz(logger):
@@ -75,7 +79,7 @@ if __name__ == "__main__":
   streamhandler.setFormatter(formatter)
   loggersrv.addHandler(streamhandler)
   loggersrv.info("Log level: %s" % log_level)
-  loggersrv.debug("user id: %s" % os.getuid())
+  loggersrv.debug("Running as UID/GID %s:%s" % (os.geteuid(), os.getegid()))
 
   change_tz(loggersrv)
   childProcess = subprocess.Popen(PYTHON3 + " -u /usr/bin/start.py", preexec_fn=change_uid_grp(loggersrv), shell=True)
