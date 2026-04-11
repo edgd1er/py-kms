@@ -1,121 +1,131 @@
 #!/usr/bin/env python3
 
-import datetime
+from datetime import datetime
 import os
 import logging
-
-# sqlite3 is optional.
-try:
-        import sqlite3
-except ImportError:
-        pass
-
-from pykms_Format import pretty_printer
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------
 
 loggersrv = logging.getLogger('logsrv')
+_column_names = ('clientMachineId', 'machineName', 'applicationId', 'skuId', 'licenseStatus', 'lastRequestTime', 'kmsEpid', 'requestCount', 'lastRequestIP')
+
+# sqlite3 is optional.
+available = False
+try:
+        import sqlite3
+        available = True
+except ImportError:
+        pass
 
 def sql_initialize(dbName):
+        if available is False:
+                loggersrv.info("'sqlite3' module not found! SQLite database support cannot be enabled.")
+                return
+        loggersrv.debug(f'SQLite database support enabled. Database file: "{dbName}"')
         if not os.path.isfile(dbName):
-                # Initialize the database.
+                # Initialize the database
                 loggersrv.debug(f'Initializing database file "{dbName}"...')
-                con = None
-                try:
-                        con = sqlite3.connect(dbName)
+                with sqlite3.connect(dbName) as con:
                         cur = con.cursor()
-                        cur.execute("CREATE TABLE clients(clientMachineId TEXT , machineName TEXT, applicationId TEXT, skuId TEXT, licenseStatus TEXT, lastRequestTime INTEGER, kmsEpid TEXT, requestCount INTEGER, PRIMARY KEY(clientMachineId, applicationId))")
+                        cur.execute("CREATE TABLE clients(clientMachineId TEXT, machineName TEXT, applicationId TEXT, skuId TEXT, licenseStatus TEXT, lastRequestTime INTEGER, kmsEpid TEXT, requestCount INTEGER, PRIMARY KEY(clientMachineId, applicationId))")
 
-                except sqlite3.Error as e:
-                        pretty_printer(log_obj = loggersrv.error, to_exit = True, put_text = "{reverse}{red}{bold}Sqlite Error: %s. Exiting...{end}" %str(e))
-                finally:
-                        if con:
-                                con.commit()
-                                con.close()
+        if os.path.isfile(dbName):
+                # Update database
+                with sqlite3.connect(dbName) as con:
+                        cur = con.cursor()
+                        # Create simple "metadata" table if not exists.
+                        cur.execute("CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY, value TEXT);")
+                        # Get the current schema version
+                        cur.execute("SELECT value FROM metadata WHERE key='schema_version';")
+                        row = cur.fetchone()
+                        if row is None:
+                                current_version = 0
+                        else:
+                                current_version = int(row[0])
+                        loggersrv.debug(f'Current database schema version: {current_version}')
+                        # Apply necessary migrations
+                        if current_version < 1:
+                                # v1: Add "lastRequestIP" column to "clients" table.
+                                loggersrv.info("Upgrading database schema to version 1...")
+                                cur.execute("ALTER TABLE clients ADD COLUMN lastRequestIP TEXT;")
+                                cur.execute("INSERT OR REPLACE INTO metadata (key, value) VALUES ('schema_version', '1');")
+                                loggersrv.info("Database schema updated to version 1.")
+
 
 def sql_get_all(dbName):
+        if available is False:
+                return
         if not os.path.isfile(dbName):
                 return None
         with sqlite3.connect(dbName) as con:
+                con.row_factory = sqlite3.Row
                 cur = con.cursor()
-                cur.execute("SELECT * FROM clients")
+                cur.execute(f"SELECT {', '.join(_column_names)} FROM clients")
                 clients = []
                 for row in cur.fetchall():
-                        clients.append({
-                                'clientMachineId': row[0],
-                                'machineName': row[1],
-                                'applicationId': row[2],
-                                'skuId': row[3],
-                                'licenseStatus': row[4],
-                                'lastRequestTime': datetime.datetime.fromtimestamp(row[5]).isoformat(),
-                                'kmsEpid': row[6],
-                                'requestCount': row[7]
-                        })
+                        loggersrv.debug(f"Row: {row}")
+                        obj = {}
+                        for col_name in _column_names:
+                                if col_name == "lastRequestTime":
+                                        obj[col_name] = datetime.fromtimestamp(row['lastRequestTime']).isoformat()
+                                else:
+                                        obj[col_name] = row[col_name]
+                        loggersrv.debug(f"Obj: {obj}")
+                        clients.append(obj)
                 return clients
 
 def sql_update(dbName, infoDict):
-        con = None
-        try:
-                con = sqlite3.connect(dbName)
-                cur = con.cursor()
-                cur.execute("SELECT * FROM clients WHERE clientMachineId=:clientMachineId AND applicationId=:appId;", infoDict)
-                try:
-                        data = cur.fetchone()
-                        if not data:
-                                # Insert row.
-                                cur.execute("INSERT INTO clients (clientMachineId, machineName, applicationId, \
-skuId, licenseStatus, lastRequestTime, requestCount) VALUES (:clientMachineId, :machineName, :appId, :skuId, :licenseStatus, :requestTime, 1);", infoDict)
-                        else:
-                                # Update data.
-                                if data[1] != infoDict["machineName"]:
-                                        cur.execute("UPDATE clients SET machineName=:machineName WHERE \
-clientMachineId=:clientMachineId AND applicationId=:appId;", infoDict)
-                                if data[2] != infoDict["appId"]:
-                                        cur.execute("UPDATE clients SET applicationId=:appId WHERE \
-clientMachineId=:clientMachineId AND applicationId=:appId;", infoDict)
-                                if data[3] != infoDict["skuId"]:
-                                        cur.execute("UPDATE clients SET skuId=:skuId WHERE \
-clientMachineId=:clientMachineId AND applicationId=:appId;", infoDict)
-                                if data[4] != infoDict["licenseStatus"]:
-                                        cur.execute("UPDATE clients SET licenseStatus=:licenseStatus WHERE \
-clientMachineId=:clientMachineId AND applicationId=:appId;", infoDict)
-                                if data[5] != infoDict["requestTime"]:
-                                        cur.execute("UPDATE clients SET lastRequestTime=:requestTime WHERE \
-clientMachineId=:clientMachineId AND applicationId=:appId;", infoDict)
-                                # Increment requestCount
-                                cur.execute("UPDATE clients SET requestCount=requestCount+1 WHERE \
-clientMachineId=:clientMachineId AND applicationId=:appId;", infoDict)
+        if available is False:
+                return
 
-                except sqlite3.Error as e:
-                        pretty_printer(log_obj = loggersrv.error, to_exit = True,
-                                       put_text = "{reverse}{red}{bold}Sqlite Error: %s. Exiting...{end}" %str(e))
-        except sqlite3.Error as e:
-                pretty_printer(log_obj = loggersrv.error, to_exit = True,
-                               put_text = "{reverse}{red}{bold}Sqlite Error: %s. Exiting...{end}" %str(e))
-        finally:
-                if con:
-                    con.commit()
-                    con.close()
+        # make sure all column names are present
+        for col_name in _column_names:
+                if col_name in ["requestCount", "kmsEpid"]:
+                        continue
+                if col_name not in infoDict:
+                        raise ValueError(f"infoDict is missing required column: {col_name}")
+
+        with sqlite3.connect(dbName) as con:
+                con.row_factory = sqlite3.Row
+                cur = con.cursor()
+                cur.execute(f"SELECT {', '.join(_column_names)} FROM clients WHERE clientMachineId=:clientMachineId AND applicationId=:applicationId;", infoDict)
+                data = cur.fetchone()
+                if not data:
+                        # Insert new row with all given info
+                        infoDict["kmsEpid"] = ""  # Default empty value
+                        infoDict["requestCount"] = 1
+                        cur.execute(f"""INSERT INTO clients ({', '.join(_column_names)})
+                                VALUES ({', '.join(':' + col for col in _column_names)});""", infoDict)
+
+                else:
+                        # Update only changed columns
+                        common_postfix = "WHERE clientMachineId=:clientMachineId AND applicationId=:applicationId"
+                        def update_column_if_changed(column_name, new_value):
+                                assert "clientMachineId" in infoDict and "applicationId" in infoDict, "infoDict must contain 'clientMachineId' and 'applicationId'"
+                                if column_name not in _column_names:
+                                        raise ValueError(f"Unknown column name: {column_name}")
+                                if data[column_name] != new_value:
+                                        query = f"UPDATE clients SET {column_name}=:value {common_postfix}"
+                                        cur.execute(query, {"value": new_value, "clientMachineId": infoDict['clientMachineId'], "applicationId": infoDict['applicationId']})
+
+                        # Dynamically check and maybe update all columns
+                        for column_name in _column_names:
+                                if column_name in ["clientMachineId", "applicationId", "requestCount"]:
+                                        continue  # Skip these columns
+                                if column_name == "kmsEpid":
+                                        # this one can only be updated by the special function
+                                        continue
+                                update_column_if_changed(column_name, infoDict[column_name])
+
+                        # Finally increment requestCount
+                        cur.execute(f"UPDATE clients SET requestCount=requestCount+1 {common_postfix}", infoDict)
 
 def sql_update_epid(dbName, kmsRequest, response, appName):
-        cmid = str(kmsRequest['clientMachineId'].get())
-        con = None
-        try:
-                con = sqlite3.connect(dbName)
-                cur = con.cursor()
-                cur.execute("SELECT * FROM clients WHERE clientMachineId=? AND applicationId=?;", (cmid, appName))
-                try:
-                        data = cur.fetchone()
-                        cur.execute("UPDATE clients SET kmsEpid=? WHERE \
-clientMachineId=? AND applicationId=?;", (str(response["kmsEpid"].decode('utf-16le')), cmid, appName))
+        if available is False:
+                return
 
-                except sqlite3.Error as e:
-                        pretty_printer(log_obj = loggersrv.error, to_exit = True,
-                                       put_text = "{reverse}{red}{bold}Sqlite Error: %s. Exiting...{end}" %str(e))
-        except sqlite3.Error as e:
-                pretty_printer(log_obj = loggersrv.error, to_exit = True,
-                               put_text = "{reverse}{red}{bold}Sqlite Error: %s. Exiting...{end}" %str(e))
-        finally:
-                if con:
-                        con.commit()
-                        con.close()
+        cmid = str(kmsRequest['clientMachineId'].get())
+        with sqlite3.connect(dbName) as con:
+                cur = con.cursor()
+                cur.execute("UPDATE clients SET kmsEpid=? WHERE clientMachineId=? AND applicationId=?;",
+                        (str(response["kmsEpid"].decode('utf-16le')), cmid, appName))

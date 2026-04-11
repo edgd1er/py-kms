@@ -170,7 +170,7 @@ def client_update():
         for appitem in appitems:
                 kmsitems = appitem['KmsItems']
                 for kmsitem in kmsitems:                                
-                        name = re.sub('\(.*\)', '', kmsitem['DisplayName']) # Remove bracets
+                        name = re.sub(r'\(.*\)', '', kmsitem['DisplayName']) # Remove brackets
                         name = name.replace('2015', '') # Remove specific years
                         name = name.replace(' ', '') # Ignore whitespaces
                         name = name.replace('/11', '', 1) # Cut out Windows 11, as it is basically Windows 10
@@ -328,7 +328,7 @@ def createKmsRequestBase():
         requestDict['clientMachineId'] = UUID(uuid.UUID(clt_config['cmid']).bytes_le if (clt_config['cmid'] is not None) else uuid.uuid4().bytes_le)
         requestDict['previousClientMachineId'] = '\0' * 16 # I'm pretty sure this is supposed to be a null UUID.
         requestDict['requiredClientCount'] = clt_config['RequiredClientCount']
-        requestDict['requestTime'] = dt_to_filetime(datetime.datetime.utcnow())
+        requestDict['requestTime'] = dt_to_filetime(datetime.datetime.now(datetime.timezone.utc))
         requestDict['machineName'] = (clt_config['machine'] if (clt_config['machine'] is not None) else
                                       ''.join(random.choice(string.ascii_letters + string.digits) for i in range(random.randint(2,63)))).encode('utf-16le')
         requestDict['mnPad'] = '\0'.encode('utf-16le') * (63 - len(requestDict['machineName'].decode('utf-16le')))

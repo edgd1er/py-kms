@@ -193,16 +193,17 @@ could be detected as not genuine !{end}" %currentClientCount)
                 infoDict = {
                         "machineName" : kmsRequest.getMachineName(),
                         "clientMachineId" : str(clientMachineId),
-                        "appId" : appName,
+                        "applicationId" : appName,
                         "skuId" : skuName,
                         "licenseStatus" : kmsRequest.getLicenseStatus(),
-                        "requestTime" : int(time.time()),
+                        "lastRequestIP" : self.srv_config['raddr'][0], # (ip, port)
+                        "lastRequestTime" : int(time.time()),
                         "kmsEpid" : None
                 }
 
                 loggersrv.info("Machine Name: %s" % infoDict["machineName"])
                 loggersrv.info("Client Machine ID: %s" % infoDict["clientMachineId"])
-                loggersrv.info("Application ID: %s" % infoDict["appId"])
+                loggersrv.info("Application ID: %s" % infoDict["applicationId"])
                 loggersrv.info("SKU ID: %s" % infoDict["skuId"])
                 loggersrv.info("License Status: %s" % infoDict["licenseStatus"])
                 loggersrv.info("Request Time: %s" % local_dt.strftime('%Y-%m-%d %H:%M:%S %Z (UTC%z)'))
@@ -211,7 +212,7 @@ could be detected as not genuine !{end}" %currentClientCount)
                         loggersrv.mininfo("", extra = {'host': str(self.srv_config['raddr']),
                                                        'status' : infoDict["licenseStatus"],
                                                        'product' : infoDict["skuId"]})
-                # Create database.
+                # Send change to database.
                 if self.srv_config['sqlite']:
                         sql_update(self.srv_config['sqlite'], infoDict)
 
