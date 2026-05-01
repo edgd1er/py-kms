@@ -40,6 +40,8 @@ jobs:
           platforms: linux/amd64,linux/386,linux/arm64/v8,linux/arm/v7,linux/arm/v6
           push: true
           tags: |
+            pykmsorg/py-kms:${{ github.ref_name }}
+            ghcr.io/py-kms-organization/py-kms:${{ github.ref_name }}
             pykmsorg/py-kms:${{ github.ref_name }}-full
             ghcr.io/py-kms-organization/py-kms:${{ github.ref_name }}-full
           build-args: |
@@ -53,8 +55,6 @@ jobs:
           platforms: linux/amd64,linux/386,linux/arm64/v8,linux/arm/v7,linux/arm/v6
           push: true
           tags: |
-            pykmsorg/py-kms:${{ github.ref_name }}
-            ghcr.io/py-kms-organization/py-kms:${{ github.ref_name }}
             pykmsorg/py-kms:${{ github.ref_name }}-minimal
             ghcr.io/py-kms-organization/py-kms:${{ github.ref_name }}-minimal
           build-args: |
