@@ -9,7 +9,7 @@ ENV LCID=1033
 ENV CLIENT_COUNT=26
 ENV ACTIVATION_INTERVAL=120
 ENV RENEWAL_INTERVAL=10080
-ENV HWID RANDOM
+ENV HWID=RANDOM
 ENV LOGLEVEL=INFO
 ENV LOGFILE=STDOUT
 ENV LOGSIZE=""
@@ -36,11 +36,10 @@ COPY docker/start.py /usr/bin/start.py
 RUN chmod 555 /usr/bin/entrypoint.py /usr/bin/healthcheck.py /usr/bin/start.py
 
 # Additional permission hardening: All files read-only for the executing user
-RUN chown root: -R /home/py-kms && \
-    chmod 444 -R /home/py-kms && \
-    chown py-kms: /home/py-kms && \
-    chmod 700 /home/py-kms && \
-    find /home/py-kms -type d -print -exec chmod +x {} ';'
+RUN find /home/py-kms -type f -print -exec chmod 444 {} ';' && \
+    find /home/py-kms -type d -print -exec chmod 555 {} ';' && \
+    chown root: -R /home/py-kms && \
+    chown py-kms: /home/py-kms
 
 WORKDIR /home/py-kms
 

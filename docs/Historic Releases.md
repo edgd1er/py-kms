@@ -1,5 +1,7 @@
 # Changelog
 
+**THIS IS A HISTORIC RELEASES FILE.** Nowadays we moved to proper semantic versioning and use Git-based tagging to track releases instead.
+
 ## py-kms_2022-12-16
 - Added support for new web-gui into Docker
 - Implemented whole-new web-based GUI with Flask

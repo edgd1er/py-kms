@@ -2,7 +2,7 @@
 FROM alpine:3.22
 
 ARG BUILD_COMMIT=unknown
-ARG BUILD_BRANCH=unknown
+ARG BUILD_REFERENCE=unknown
 
 ENV IP=::
 ENV DUALSTACK=1
@@ -29,7 +29,7 @@ RUN apk add --no-cache --update \
   tzdata \
   shadow \
   && pip3 install --break-system-packages --no-cache-dir -r /home/py-kms/requirements.txt \
-  && mkdir /db/ \
+  && mkdir /db/ /home/py-kms/db \
   && adduser -S py-kms -G users -s /bin/bash \
   && chown py-kms:users /home/py-kms \
   # Fix undefined timezone, in case the user did not mount the /etc/localtime
@@ -41,16 +41,17 @@ COPY docker/healthcheck.py /usr/bin/healthcheck.py
 COPY docker/start.py /usr/bin/start.py
 RUN chmod 555 /usr/bin/entrypoint.py /usr/bin/healthcheck.py /usr/bin/start.py
 
-# Additional permission hardening: All files read-only for the executing user
-RUN chown root: -R /home/py-kms && \
-    chmod 444 -R /home/py-kms && \
+# Additional permission hardening: keep application files read-only, but preserve
+# a dedicated writable database directory for WebUI/SQLite at runtime.
+RUN find /home/py-kms -type f -print -exec chmod 444 {} ';' && \
+    find /home/py-kms -type d -print -exec chmod 555 {} ';' && \
+    chown root: -R /home/py-kms && \
     chown py-kms: /home/py-kms && \
-    chmod 700 /home/py-kms && \
-    find /home/py-kms -type d -print -exec chmod +x {} ';'
+    chmod 1777 /home/py-kms/db
 
 # Web-interface specifics
 COPY LICENSE /LICENSE
-RUN echo "$BUILD_COMMIT" > /VERSION && echo "$BUILD_BRANCH" >> /VERSION
+RUN echo "$BUILD_COMMIT" > /VERSION && echo "$BUILD_REFERENCE" >> /VERSION
 
 WORKDIR /home/py-kms
 

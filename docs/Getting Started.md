@@ -14,7 +14,7 @@ command will download, "install" and start _py-kms_ and also keep it alive after
 ```bash
 docker run -d --name py-kms --restart always -p 1688:1688 -v /etc/localtime:/etc/localtime:ro ghcr.io/py-kms-organization/py-kms
 ```
-If you just want to use the image and don't want to build them yourself, you can always use the official image at the [GitHub Container Registry](https://github.com/Py-KMS-Organization/py-kms/pkgs/container/py-kms) (`ghcr.io/py-kms-organization/py-kms`). To ensure that you are using always the latest version you should check something like [watchtower](https://github.com/containrrr/watchtower) out!
+If you just want to use the image and don't want to build them yourself, you can always use the official image at the [GitHub Container Registry](https://github.com/Py-KMS-Organization/py-kms/pkgs/container/py-kms) (`ghcr.io/py-kms-organization/py-kms`). To ensure that you are using always the latest version you should check something like [watchtower](https://github.com/nicholas-fedor/watchtower/) out!
 
 #### Tags
 There are currently three tags of the image available (select one just by appending `:<tag>` to the image from above):

@@ -72,9 +72,12 @@ def start_kms(logger):
     pass
   except KeyboardInterrupt:
     pass
+  logger.info("Shutting down...")
 
   if pykms_webui_process:
+    logger.debug("Terminating webui process...")
     pykms_webui_process.terminate()
+  logger.debug("Terminating KMS process...")
   pykms_process.terminate()
 
 
@@ -90,6 +93,7 @@ if __name__ == "__main__":
   formatter = logging.Formatter(fmt='\x1b[94m%(asctime)s %(levelname)-8s %(message)s', datefmt='%a, %d %b %Y %H:%M:%S')
   streamhandler.setFormatter(formatter)
   loggersrv.addHandler(streamhandler)
-  loggersrv.debug("user id: %s" % os.getuid())
+  loggersrv.info("Log level: %s" % log_level)
+  loggersrv.debug("Running as UID/GID %s:%s" % (os.geteuid(), os.getegid()))
 
   start_kms(loggersrv)
